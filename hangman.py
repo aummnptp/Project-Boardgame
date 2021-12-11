@@ -6,6 +6,7 @@ pygame.init()
 width, hight = 800, 500
 win = pygame.display.set_mode((width,hight))
 pygame.display.set_caption("Hangman")
+pygame.mixer.init()
 
 
 #ปุ่ม variables
@@ -24,6 +25,8 @@ for i in range(26):
 LETTER_FONT = pygame.font.SysFont("comicsans", 30)
 WORD_FONT = pygame.font.SysFont('comicsans', 55)
 
+#Sound
+PressSound= pygame.mixer.Sound('press.wav')
 #load รูป
 images = []
 for i in range(7):
@@ -40,12 +43,7 @@ words = [random.choice(word_list).upper()]
 word = random.choice(words)
 guessed = []
 print(word)
-
-#setgameloop
-FPS = 60
-clock = pygame.time.Clock()
-run = True  
-
+ 
 def draw():
     win.fill(WHITE)
     #draw word
@@ -74,9 +72,13 @@ def display_message(message):
     text = WORD_FONT.render(message, 1 , BLACK)
     win.blit(text, (width/2 - text.get_width()/2, hight/2 - text.get_height()/2))
     pygame.display.update()
-    pygame.time.delay(3000)
+    pygame.time.delay(1000)
 
-
+#setgameloop
+FPS = 60
+clock = pygame.time.Clock()
+run = True 
+    
 while run:
     clock.tick(FPS)
 
@@ -96,20 +98,41 @@ while run:
                         guessed.append(ltr)
                         if ltr not in word:
                             hangman_status += 1
+                        PressSound.play()#เสียงตอนกดปุ่ม
+        if event.type == pygame.KEYDOWN:
+            #รีเซตเกม
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                hangman_status = 0
+                words = [random.choice(word_list).upper()]
+                word = random.choice(words)
+                letters = []
+                guessed = []
+                images = []
+
+                for i in range(7):
+                    image = pygame.image.load("hangman" + str(i) + ".png")
+                    images.append(image)
+                print(word)
+                for i in range(26):
+                    x = startx + GAP * 2 + (RADIUS * 2 + GAP) * (i% 13)
+                    y = starty + ((i//13)*(GAP + RADIUS * 2))
+                    letters.append([x, y, chr(A + i), True])
     
-    won = True
+   won = True
     for letter in word:
         if letter not in guessed:
             won = False
-            break
-
+    
+    word_correct = "Correct word:" 
+    #ถ้าชนะ
     if won:
         display_message("YOU WON!")
-        break
 
+    #ถ้าแพ้(hangman=6)
     if hangman_status == 6:
-        display_message("YOU LOSE T-T")
-        break
+        word_correct += word
+        display_message(word_correct)
+
 
 
 
