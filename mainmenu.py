@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, os
 import random
 from tkinter import *
 from pygame import mixer
@@ -352,6 +352,6 @@ def tict():
         pygame.display.update()
 
 def hang():
-    print('yee')
+    os.system('python hang.py')
 
 main_menu()
